@@ -1,5 +1,4 @@
 rm(list = ls())
-library(magrittr)
 
 PATH = '/Volumes/One Touch/raw'
 
@@ -36,7 +35,8 @@ get_last_created <- function(listed_files, file){
 
 
 remove_duplicates <- function(files_listed){
-  to_remove <- files_listed %>% table %>% sort(.,T) %>% .[.>1] %>% names
+  to_remove_table <- sort(table(files_listed ),T)
+  to_remove <- names(to_remove_table[to_remove_table>1])
   rm_files = unlist(lapply(to_remove, function(x) get_last_created(files_listed, x)))
   for(file in rm_files){
     file.remove(file)
@@ -44,10 +44,7 @@ remove_duplicates <- function(files_listed){
 }
 
 main <- function(path){
-  path %>% 
-    list_files() %>% 
-    sapply(., created_time_filename) -> ls
-  
+  ls <- sapply(list_files(path) , created_time_filename) 
   remove_duplicates(ls)
   old_files = names(ls)
   new_files = as.character(ls)
